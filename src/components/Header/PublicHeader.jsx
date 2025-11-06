@@ -8,23 +8,69 @@ export default function PublicHeader() {
   const navigate = useNavigate();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("hero-section");
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 0);
+      
+      // Update active section on scroll
+      if (location.pathname === "/") {
+        const sections = ["hero-section", "projects-section", "contact-section"];
+        for (const sectionId of sections) {
+          const element = document.getElementById(sectionId);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            if (rect.top <= 200 && rect.bottom >= 200) {
+              setActiveSection(sectionId);
+              break;
+            }
+          }
+        }
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   const isActive = (path) => location.pathname === path;
+
+  const isSectionActive = (sectionId) => {
+    if (location.pathname !== "/") return false;
+    return activeSection === sectionId;
+  };
+
+  const handleNavigation = (sectionId) => {
+    setActiveSection(sectionId);
+    if (location.pathname === "/") {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    } else {
+      navigate("/");
+      setTimeout(() => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }, 100);
+    }
+  };
 
   return (
     <>
       <AppBar
         position="fixed"
         sx={{
+          display: { xs: "none", md: "flex" },
           backgroundColor: scrolled
             ? "rgba(255, 255, 255, 0.1)"
             : "transparent",
@@ -41,15 +87,12 @@ export default function PublicHeader() {
               alignItems: "center",
               justifyContent: "space-between",
               width: "100%",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: { xs: 2, sm: 0 },
             }}
           >
             <Box
               sx={{
                 mr: { xs: 0, sm: 5 },
                 flexGrow: 1,
-                width: { xs: "100%", sm: "auto" },
               }}
             >
               <Box
@@ -65,12 +108,12 @@ export default function PublicHeader() {
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: { xs: "center", sm: "flex-start" },
+                    justifyContent: "flex-start",
                   }}
                 >
                   <img
-                    src="/betheltus-logo.png"
-                    alt="Betheltus Construction Logo"
+                    src="/owino-logo.jpg"
+                    alt="Owino Interiors Logo"
                     style={{
                       height: "64px",
                       width: "auto",
@@ -88,11 +131,13 @@ export default function PublicHeader() {
                     <Typography
                       variant="body2"
                       sx={{
-                        fontSize: { xs: "0.875rem", sm: "1rem" },
-                        color: "inherit",
+                        fontSize: { xs: "1.5rem", sm: "2.25rem" },
+                        color: "#000000",
+                        fontWeight: 900,
+                        fontFamily: "'Monotype Corsiva', 'Brush Script MT', cursive",
                       }}
                     >
-                      Betheltus Construction LTD
+                      Owino Interiors
                     </Typography>
                   </Box>
                 </Box>
@@ -101,156 +146,279 @@ export default function PublicHeader() {
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
-                gap: 4,
+                gap: 2,
                 alignItems: "center",
                 mr: 4,
               }}
             >
-              <Link
-                component="button"
-                onClick={() => {
-                  if (location.pathname === "/") {
-                    // If on home page, scroll to Hero section
-                    const heroSection = document.getElementById("hero-section");
-                    if (heroSection) {
-                      heroSection.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                      });
-                    }
-                  } else {
-                    // If on other pages, navigate to home and then scroll
-                    navigate("/");
-                    setTimeout(() => {
-                      const heroSection =
-                        document.getElementById("hero-section");
-                      if (heroSection) {
-                        heroSection.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                      }
-                    }, 100);
-                  }
-                }}
+              <Button
+                onClick={() => handleNavigation("hero-section")}
+                startIcon={<Home />}
                 sx={{
-                  color: scrolled ? "primary.main" : "white",
+                  backgroundColor: "rgba(255, 248, 220, 0.7)",
+                  backdropFilter: "blur(10px)",
+                  color: "rgba(0, 0, 0, 0.8)",
                   textDecoration: "none",
-                  fontSize: "1.25rem",
+                  fontSize: "1rem",
                   fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  "&:hover": { color: "primary.main" },
-                  borderBottom: isActive("/") ? "2px solid" : "none",
-                  borderColor: "primary.main",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
+                  borderRadius: "25px",
+                  px: 3,
+                  py: 1,
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 248, 220, 0.9)",
+                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
+                    transform: "translateY(-2px)",
+                  },
+                  transition: "all 0.3s ease-in-out",
                 }}
               >
-                <Home sx={{ fontSize: "1.2rem" }} />
                 Home
-              </Link>
-              <Link
-                component="button"
-                onClick={() => {
-                  if (location.pathname === "/") {
-                    // If on home page, scroll to Projects section
-                    const projectsSection =
-                      document.getElementById("projects-section");
-                    if (projectsSection) {
-                      projectsSection.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                      });
-                    }
-                  } else {
-                    // If on other pages, navigate to home and then scroll
-                    navigate("/");
-                    setTimeout(() => {
-                      const projectsSection =
-                        document.getElementById("projects-section");
-                      if (projectsSection) {
-                        projectsSection.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                      }
-                    }, 100);
-                  }
-                }}
+              </Button>
+              <Button
+                onClick={() => handleNavigation("projects-section")}
+                startIcon={<Construction />}
                 sx={{
-                  color: scrolled ? "primary.main" : "white",
+                  backgroundColor: "rgba(255, 248, 220, 0.7)",
+                  backdropFilter: "blur(10px)",
+                  color: "rgba(0, 0, 0, 0.8)",
                   textDecoration: "none",
-                  fontSize: "1.25rem",
+                  fontSize: "1rem",
                   fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  "&:hover": { color: "primary.main" },
-                  borderBottom: isActive("/projects") ? "2px solid" : "none",
-                  borderColor: "primary.main",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
+                  borderRadius: "25px",
+                  px: 3,
+                  py: 1,
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 248, 220, 0.9)",
+                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
+                    transform: "translateY(-2px)",
+                  },
+                  transition: "all 0.3s ease-in-out",
                 }}
               >
-                <Construction sx={{ fontSize: "1.2rem" }} />
                 Projects
-              </Link>
-              <Link
-                component="button"
-                onClick={() => {
-                  if (location.pathname === "/") {
-                    // If on home page, scroll to Contact section
-                    const contactSection =
-                      document.getElementById("contact-section");
-                    if (contactSection) {
-                      contactSection.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                      });
-                    }
-                  } else {
-                    // If on other pages, navigate to home and then scroll
-                    navigate("/");
-                    setTimeout(() => {
-                      const contactSection =
-                        document.getElementById("contact-section");
-                      if (contactSection) {
-                        contactSection.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                      }
-                    }, 100);
-                  }
-                }}
+              </Button>
+              <Button
+                onClick={() => handleNavigation("contact-section")}
+                startIcon={<ContactSupport />}
                 sx={{
-                  color: scrolled ? "primary.main" : "white",
+                  backgroundColor: "rgba(255, 248, 220, 0.7)",
+                  backdropFilter: "blur(10px)",
+                  color: "rgba(0, 0, 0, 0.8)",
                   textDecoration: "none",
-                  fontSize: "1.25rem",
+                  fontSize: "1rem",
                   fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  "&:hover": { color: "primary.main" },
-                  borderBottom: isActive("/contact") ? "2px solid" : "none",
-                  borderColor: "primary.main",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
+                  borderRadius: "25px",
+                  px: 3,
+                  py: 1,
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 248, 220, 0.9)",
+                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
+                    transform: "translateY(-2px)",
+                  },
+                  transition: "all 0.3s ease-in-out",
                 }}
               >
-                <ContactSupport sx={{ fontSize: "1.2rem" }} />
                 Contact
-              </Link>
+              </Button>
             </Box>
           </Box>
         </Toolbar>
       </AppBar>
-      <Toolbar />
+      <Toolbar sx={{ display: { xs: "none", md: "block" } }} />
+      {/* Mobile Navigation Bar - Bottom */}
+      <Box
+        sx={{
+          display: { xs: "flex", md: "none" },
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: "#1B4D4D",
+          boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.3)",
+          zIndex: 1100,
+          justifyContent: "space-around",
+          alignItems: "center",
+          py: 1.5,
+          borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+        }}
+      >
+        <Link
+          component="button"
+          onClick={() => handleNavigation("hero-section")}
+          sx={{
+            textDecoration: "none",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 0.5,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            px: 2,
+            minWidth: "60px",
+            outline: "none",
+            "&:focus": {
+              outline: "none",
+              "& .MuiSvgIcon-root": {
+                color: "#C9B99B",
+              },
+              "& .MuiTypography-root": {
+                color: "#C9B99B",
+              },
+            },
+            "&:focus-visible": {
+              outline: "none",
+              "& .MuiSvgIcon-root": {
+                color: "#C9B99B",
+              },
+              "& .MuiTypography-root": {
+                color: "#C9B99B",
+              },
+            },
+          }}
+        >
+          <Home
+            sx={{
+              fontSize: "1.5rem",
+              color: isSectionActive("hero-section")
+                ? "#FFF8DC"
+                : "rgba(255, 255, 255, 0.7)",
+            }}
+          />
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "0.75rem",
+              color: isSectionActive("hero-section")
+                ? "#FFF8DC"
+                : "rgba(255, 255, 255, 0.7)",
+              fontWeight: 500,
+            }}
+          >
+            Home
+          </Typography>
+        </Link>
+        <Link
+          component="button"
+          onClick={() => handleNavigation("projects-section")}
+          sx={{
+            textDecoration: "none",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 0.5,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            px: 2,
+            minWidth: "60px",
+            outline: "none",
+            "&:focus": {
+              outline: "none",
+              "& .MuiSvgIcon-root": {
+                color: "#C9B99B",
+              },
+              "& .MuiTypography-root": {
+                color: "#C9B99B",
+              },
+            },
+            "&:focus-visible": {
+              outline: "none",
+              "& .MuiSvgIcon-root": {
+                color: "#C9B99B",
+              },
+              "& .MuiTypography-root": {
+                color: "#C9B99B",
+              },
+            },
+          }}
+        >
+          <Construction
+            sx={{
+              fontSize: "1.5rem",
+              color: isSectionActive("projects-section")
+                ? "#FFF8DC"
+                : "rgba(255, 255, 255, 0.7)",
+            }}
+          />
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "0.75rem",
+              color: isSectionActive("projects-section")
+                ? "#FFF8DC"
+                : "rgba(255, 255, 255, 0.7)",
+              fontWeight: 500,
+            }}
+          >
+            Projects
+          </Typography>
+        </Link>
+        <Link
+          component="button"
+          onClick={() => handleNavigation("contact-section")}
+          sx={{
+            textDecoration: "none",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 0.5,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            px: 2,
+            minWidth: "60px",
+            outline: "none",
+            "&:focus": {
+              outline: "none",
+              "& .MuiSvgIcon-root": {
+                color: "#C9B99B",
+              },
+              "& .MuiTypography-root": {
+                color: "#C9B99B",
+              },
+            },
+            "&:focus-visible": {
+              outline: "none",
+              "& .MuiSvgIcon-root": {
+                color: "#C9B99B",
+              },
+              "& .MuiTypography-root": {
+                color: "#C9B99B",
+              },
+            },
+          }}
+        >
+          <ContactSupport
+            sx={{
+              fontSize: "1.5rem",
+              color: isSectionActive("contact-section")
+                ? "#FFF8DC"
+                : "rgba(255, 255, 255, 0.7)",
+            }}
+          />
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "0.75rem",
+              color: isSectionActive("contact-section")
+                ? "#FFF8DC"
+                : "rgba(255, 255, 255, 0.7)",
+              fontWeight: 500,
+            }}
+          >
+            Contact
+          </Typography>
+        </Link>
+      </Box>
+      {/* Spacer for bottom mobile nav */}
+      <Box sx={{ display: { xs: "block", md: "none" }, height: "70px" }} />
     </>
   );
 }

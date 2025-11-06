@@ -3,7 +3,7 @@ import { Typography, Box, Container, Tooltip, Button } from "@mui/material";
 import Hero1 from "../../assets/images/beth1.jpg";
 import Hero2 from "../../assets/images/beth2.jpg";
 import Hero3 from "../../assets/images/beth3.jpg";
-import { Construction, Engineering, Timeline } from "@mui/icons-material";
+import { DesignServices, Person, Timeline } from "@mui/icons-material";
 
 export default function HeroSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -55,7 +55,7 @@ export default function HeroSection() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          color: "white",
+          color: "#FFF8DC",
           zIndex: 1,
           px: { xs: 2, sm: 4, md: 6 },
           maxWidth: "1400px",
@@ -76,9 +76,10 @@ export default function HeroSection() {
               fontWeight: 600,
               mb: 2,
               textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
+              color: "#FFF8DC",
             }}
           >
-            Welcome to Betheltus Construction LTD
+            Welcome to Owino Interiors
           </Typography>
           <Typography
             variant="h5"
@@ -86,9 +87,10 @@ export default function HeroSection() {
               mb: 4,
               textShadow: "1px 1px 2px rgba(0,0,0,0.3)",
               opacity: 0.9,
+              color: "#FFF8DC",
             }}
           >
-            Your Vision, Our Construction
+            Curating Beauty in Every Space
           </Typography>
           <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
             {/* <Button
@@ -147,7 +149,7 @@ export default function HeroSection() {
           animation: "slideUp 1s ease-out",
         }}
       >
-        <Tooltip title="Quality Construction">
+        <Tooltip title="Elegant Designs">
           <Box
             sx={{
               display: "flex",
@@ -160,11 +162,11 @@ export default function HeroSection() {
               },
             }}
           >
-            <Construction sx={{ fontSize: 24 }} />
-            <Typography>Quality Construction</Typography>
+            <DesignServices sx={{ fontSize: 24 }} />
+            <Typography>Elegant Designs</Typography>
           </Box>
         </Tooltip>
-        <Tooltip title="Expert Engineering">
+        <Tooltip title="Expert Consultation">
           <Box
             sx={{
               display: "flex",
@@ -177,8 +179,8 @@ export default function HeroSection() {
               },
             }}
           >
-            <Engineering sx={{ fontSize: 24 }} />
-            <Typography>Expert Engineering</Typography>
+            <Person sx={{ fontSize: 24 }} />
+            <Typography>Expert Consultation</Typography>
           </Box>
         </Tooltip>
         <Tooltip title="Timely Delivery">
