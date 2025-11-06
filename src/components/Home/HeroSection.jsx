@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Typography, Box, Container, Tooltip, Button } from "@mui/material";
-import Hero1 from "../../assets/images/beth1.jpg";
-import Hero2 from "../../assets/images/beth2.jpg";
-import Hero3 from "../../assets/images/beth3.jpg";
 import { DesignServices, Person, Timeline } from "@mui/icons-material";
 
 export default function HeroSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const images = [Hero1, Hero2, Hero3];
+  const images = [
+    "/images/owino bg 1.jpg",
+    "/images/owino bg 2.jpg",
+    "/images/owino bg 3.jpg"
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -72,7 +73,7 @@ export default function HeroSection() {
           <Typography
             variant="h1"
             sx={{
-              fontSize: { xs: "1.5rem", md: "2.5rem" },
+              fontSize: { xs: "1.2rem", sm: "1.8rem", md: "2.5rem" },
               fontWeight: 600,
               mb: 2,
               textShadow: "2px 2px 4px rgba(0,0,0,0.3)",
@@ -84,6 +85,7 @@ export default function HeroSection() {
           <Typography
             variant="h5"
             sx={{
+              fontSize: { xs: "0.875rem", sm: "1rem", md: "1.25rem" },
               mb: 4,
               textShadow: "1px 1px 2px rgba(0,0,0,0.3)",
               opacity: 0.9,
@@ -143,8 +145,8 @@ export default function HeroSection() {
           right: 0,
           display: "flex",
           justifyContent: "center",
-          gap: 4,
-          p: 3,
+          gap: { xs: 1.5, sm: 3, md: 4 },
+          p: { xs: 2, sm: 2.5, md: 3 },
           backgroundColor: "rgba(0,0,0,0.5)",
           animation: "slideUp 1s ease-out",
         }}
@@ -162,8 +164,10 @@ export default function HeroSection() {
               },
             }}
           >
-            <DesignServices sx={{ fontSize: 24 }} />
-            <Typography>Elegant Designs</Typography>
+            <DesignServices sx={{ fontSize: { xs: 18, sm: 24 } }} />
+            <Typography sx={{ fontSize: { xs: "0.7rem", sm: "0.875rem", md: "1rem" } }}>
+              Elegant Designs
+            </Typography>
           </Box>
         </Tooltip>
         <Tooltip title="Expert Consultation">
@@ -179,8 +183,10 @@ export default function HeroSection() {
               },
             }}
           >
-            <Person sx={{ fontSize: 24 }} />
-            <Typography>Expert Consultation</Typography>
+            <Person sx={{ fontSize: { xs: 18, sm: 24 } }} />
+            <Typography sx={{ fontSize: { xs: "0.7rem", sm: "0.875rem", md: "1rem" } }}>
+              Expert Consultation
+            </Typography>
           </Box>
         </Tooltip>
         <Tooltip title="Timely Delivery">
@@ -196,8 +202,10 @@ export default function HeroSection() {
               },
             }}
           >
-            <Timeline sx={{ fontSize: 24 }} />
-            <Typography>Timely Delivery</Typography>
+            <Timeline sx={{ fontSize: { xs: 18, sm: 24 } }} />
+            <Typography sx={{ fontSize: { xs: "0.7rem", sm: "0.875rem", md: "1rem" } }}>
+              Timely Delivery
+            </Typography>
           </Box>
         </Tooltip>
       </Box>

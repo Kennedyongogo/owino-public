@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AppBar, Toolbar, Box, Typography, Link, Button } from "@mui/material";
 // Logo now served from public folder
-import { Construction, ContactSupport, Home } from "@mui/icons-material";
+import { Construction, ContactSupport, Home, DesignServices } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function PublicHeader() {
@@ -16,7 +16,7 @@ export default function PublicHeader() {
       
       // Update active section on scroll
       if (location.pathname === "/") {
-        const sections = ["hero-section", "projects-section", "contact-section"];
+        const sections = ["hero-section", "services-section", "projects-section", "contact-section"];
         for (const sectionId of sections) {
           const element = document.getElementById(sectionId);
           if (element) {
@@ -177,6 +177,31 @@ export default function PublicHeader() {
                 Home
               </Button>
               <Button
+                onClick={() => handleNavigation("services-section")}
+                startIcon={<DesignServices />}
+                sx={{
+                  backgroundColor: "rgba(255, 248, 220, 0.7)",
+                  backdropFilter: "blur(10px)",
+                  color: "rgba(0, 0, 0, 0.8)",
+                  textDecoration: "none",
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  borderRadius: "25px",
+                  px: 3,
+                  py: 1,
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 248, 220, 0.9)",
+                    boxShadow: "0 6px 12px rgba(0, 0, 0, 0.15)",
+                    transform: "translateY(-2px)",
+                  },
+                  transition: "all 0.3s ease-in-out",
+                }}
+              >
+                Our Services
+              </Button>
+              <Button
                 onClick={() => handleNavigation("projects-section")}
                 startIcon={<Construction />}
                 sx={{
@@ -302,6 +327,62 @@ export default function PublicHeader() {
             }}
           >
             Home
+          </Typography>
+        </Link>
+        <Link
+          component="button"
+          onClick={() => handleNavigation("services-section")}
+          sx={{
+            textDecoration: "none",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 0.5,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            px: 2,
+            minWidth: "60px",
+            outline: "none",
+            "&:focus": {
+              outline: "none",
+              "& .MuiSvgIcon-root": {
+                color: "#C9B99B",
+              },
+              "& .MuiTypography-root": {
+                color: "#C9B99B",
+              },
+            },
+            "&:focus-visible": {
+              outline: "none",
+              "& .MuiSvgIcon-root": {
+                color: "#C9B99B",
+              },
+              "& .MuiTypography-root": {
+                color: "#C9B99B",
+              },
+            },
+          }}
+        >
+          <DesignServices
+            sx={{
+              fontSize: "1.5rem",
+              color: isSectionActive("services-section")
+                ? "#FFF8DC"
+                : "rgba(255, 255, 255, 0.7)",
+            }}
+          />
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "0.75rem",
+              color: isSectionActive("services-section")
+                ? "#FFF8DC"
+                : "rgba(255, 255, 255, 0.7)",
+              fontWeight: 500,
+            }}
+          >
+            Services
           </Typography>
         </Link>
         <Link
