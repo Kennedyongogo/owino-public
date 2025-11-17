@@ -4,7 +4,7 @@ import HeroSection from "../components/Home/HeroSection";
 import ServicesSection from "../components/Home/ServicesSection";
 import ProjectsSection from "../components/Home/ProjectsSection";
 import ContactSection from "../components/Home/ContactSection";
-import Footer from "../components/Footer/Footer";
+import FooterCard from "../components/Common/FooterCard";
 
 export default function Home() {
   return (
@@ -13,7 +13,9 @@ export default function Home() {
       <ServicesSection />
       <ProjectsSection />
       <ContactSection />
-      <Footer />
+      <FooterCard />
+      {/* Spacer to keep bottom content visible above the fixed mobile navbar */}
+      <Box sx={{ display: { xs: "block", md: "none" }, height: "80px" }} />
     </Box>
   );
 }

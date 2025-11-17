@@ -203,7 +203,19 @@ export default function ContactSection() {
       id="contact-section"
       sx={{
         py: 4,
-        backgroundColor: "#f8f9fa",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 50%, #f0f2f5 100%)",
+        position: "relative",
+        overflow: "hidden",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "radial-gradient(circle at 20% 50%, rgba(0,0,0,0.02) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,0,0,0.02) 0%, transparent 50%)",
+          pointerEvents: "none",
+        },
       }}
     >
       <Box
@@ -211,6 +223,8 @@ export default function ContactSection() {
           maxWidth: "1400px",
           margin: "0 auto",
           px: { xs: 2, sm: 4, md: 6 },
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <MotionBox
@@ -220,33 +234,58 @@ export default function ContactSection() {
           viewport={{ once: true }}
         >
           <Paper
-            elevation={6}
+            elevation={0}
             sx={{
               borderRadius: 4,
               overflow: "hidden",
               backgroundColor: "white",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9)",
+              border: "1px solid rgba(0,0,0,0.08)",
+              position: "relative",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "4px",
+                background: "linear-gradient(90deg, #1a1a1a 0%, #4a4a4a 50%, #1a1a1a 100%)",
+              },
             }}
           >
             <Box sx={{ p: 6 }}>
               <Box sx={{ textAlign: "center", mb: 4 }}>
-                <Typography
-                  variant="h2"
-                  sx={{
-                    fontWeight: 600,
-                    color: "primary.main",
-                    mb: 2,
-                  }}
+                <MotionBox
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  viewport={{ once: true }}
                 >
-                  Contact Us
-                </Typography>
-                <Typography
-                  variant="h6"
-                  color="text.secondary"
-                  sx={{ maxWidth: 600, mx: "auto" }}
-                >
-                  Get in touch with us for your construction needs
-                </Typography>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: 700,
+                      color: "#000",
+                      mb: 2,
+                      letterSpacing: "-0.5px",
+                      textShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    }}
+                  >
+                    Contact Us
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      maxWidth: 600,
+                      mx: "auto",
+                      color: "#333",
+                      fontSize: "1rem",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    Get in touch with us for your construction needs
+                  </Typography>
+                </MotionBox>
               </Box>
 
               <Box
@@ -262,6 +301,32 @@ export default function ContactSection() {
                   required
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#fafafa",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#666",
+                        },
+                      },
+                      "&.Mui-focused": {
+                        backgroundColor: "#fff",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#333",
+                          borderWidth: "2px",
+                        },
+                      },
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#666",
+                      "&.Mui-focused": {
+                        color: "#000",
+                        fontWeight: 500,
+                      },
+                    },
+                  }}
                 />
 
                 <TextField
@@ -273,9 +338,65 @@ export default function ContactSection() {
                   required
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#fafafa",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#666",
+                        },
+                      },
+                      "&.Mui-focused": {
+                        backgroundColor: "#fff",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#333",
+                          borderWidth: "2px",
+                        },
+                      },
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#666",
+                      "&.Mui-focused": {
+                        color: "#000",
+                        fontWeight: 500,
+                      },
+                    },
+                  }}
                 />
 
-                <FormControl fullWidth margin="normal" required>
+                <FormControl
+                  fullWidth
+                  margin="normal"
+                  required
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#fafafa",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#666",
+                        },
+                      },
+                      "&.Mui-focused": {
+                        backgroundColor: "#fff",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#333",
+                          borderWidth: "2px",
+                        },
+                      },
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#666",
+                      "&.Mui-focused": {
+                        color: "#000",
+                        fontWeight: 500,
+                      },
+                    },
+                  }}
+                >
                   <InputLabel>Category</InputLabel>
                   <Select
                     value={formData.category}
@@ -309,6 +430,32 @@ export default function ContactSection() {
                       {...params}
                       label="Project (Optional)"
                       margin="normal"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#fafafa",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            backgroundColor: "#f5f5f5",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#666",
+                            },
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#fff",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              borderColor: "#333",
+                              borderWidth: "2px",
+                            },
+                          },
+                        },
+                        "& .MuiInputLabel-root": {
+                          color: "#666",
+                          "&.Mui-focused": {
+                            color: "#000",
+                            fontWeight: 500,
+                          },
+                        },
+                      }}
                       InputProps={{
                         ...params.InputProps,
                         endAdornment: (
@@ -331,10 +478,12 @@ export default function ContactSection() {
                           width: "100%",
                         }}
                       >
-                        <Business sx={{ mr: 1, color: "text.secondary" }} />
+                        <Business sx={{ mr: 1, color: "#666" }} />
                         <Box>
-                          <Typography variant="body1">{option.name}</Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="body1" sx={{ color: "#000" }}>
+                            {option.name}
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: "#666" }}>
                             {option.location} • {option.status}
                           </Typography>
                         </Box>
@@ -358,25 +507,76 @@ export default function ContactSection() {
                   onChange={(e) =>
                     handleInputChange("description", e.target.value)
                   }
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#fafafa",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#666",
+                        },
+                      },
+                      "&.Mui-focused": {
+                        backgroundColor: "#fff",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#333",
+                          borderWidth: "2px",
+                        },
+                      },
+                    },
+                    "& .MuiInputLabel-root": {
+                      color: "#666",
+                      "&.Mui-focused": {
+                        color: "#000",
+                        fontWeight: 500,
+                      },
+                    },
+                  }}
                 />
 
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  startIcon={
-                    loading ? <CircularProgress size={20} /> : <Send />
-                  }
-                  disabled={loading}
-                  sx={{
-                    mt: 2,
-                    px: 4,
-                    py: 1.5,
-                    fontSize: "1.1rem",
-                  }}
-                >
-                  {loading ? "Sending..." : "Send Message"}
-                </Button>
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    startIcon={
+                      loading ? (
+                        <CircularProgress size={20} sx={{ color: "#fff" }} />
+                      ) : (
+                        <Send sx={{ color: "#fff" }} />
+                      )
+                    }
+                    disabled={loading}
+                    sx={{
+                      px: 5,
+                      py: 1.5,
+                      fontSize: "1rem",
+                      fontWeight: 600,
+                      textTransform: "none",
+                      background: "linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 50%, #2a2a2a 100%)",
+                      color: "#fff",
+                      borderRadius: 2,
+                      boxShadow: "0 4px 15px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.15)",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      "&:hover": {
+                        background: "linear-gradient(135deg, #2a2a2a 0%, #5a5a5a 50%, #3a3a3a 100%)",
+                        boxShadow: "0 6px 20px rgba(0,0,0,0.35), 0 3px 8px rgba(0,0,0,0.2)",
+                        transform: "translateY(-2px)",
+                      },
+                      "&:active": {
+                        transform: "translateY(0)",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                      },
+                      "&:disabled": {
+                        background: "linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 50%, #2a2a2a 100%)",
+                        opacity: 0.6,
+                      },
+                    }}
+                  >
+                    {loading ? "Sending..." : "Send Message"}
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Paper>
