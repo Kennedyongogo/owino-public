@@ -14,8 +14,6 @@ export default function Home() {
       <ProjectsSection />
       <ContactSection />
       <FooterCard />
-      {/* Spacer to keep bottom content visible above the fixed mobile navbar */}
-      <Box sx={{ display: { xs: "block", md: "none" }, height: "80px" }} />
     </Box>
   );
 }
