@@ -4,3 +4,8 @@
   width: 100%;
   padding: 0;
 }
+
+/* Remove browser black focus ring on mouse click; MUI theme handles keyboard focus */
+#root button:focus:not(:focus-visible) {
+  outline: none;
+}

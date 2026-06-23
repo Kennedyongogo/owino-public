@@ -11,6 +11,11 @@ import {
   Bolt,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
+import {
+  SAFEWIRE_PHONE_DISPLAY,
+  SAFEWIRE_PHONE_TEL,
+  SAFEWIRE_LOCATION,
+} from "../../constants/contact";
 
 const BRAND_BLUE = "#1a5fb4";
 const BRAND_BLUE_DARK = "#134a8c";
@@ -38,24 +43,62 @@ const sectionTitleSx = {
 };
 
 const linkSx = {
+  position: "relative",
   cursor: "pointer",
   color: "rgba(255,255,255,0.9)",
   textDecoration: "none",
   fontSize: "0.9rem",
   fontWeight: 500,
-  background: "none",
+  background: "transparent",
+  backgroundColor: "transparent",
   border: "none",
+  boxShadow: "none",
   fontFamily: "inherit",
   textAlign: "left",
   p: 0,
-  py: 0.4,
-  display: "flex",
-  alignItems: "center",
-  gap: 0.75,
-  transition: "color 0.2s ease, transform 0.2s ease",
+  py: 0.5,
+  px: 0,
+  minWidth: "auto",
+  display: "inline-block",
+  WebkitTapHighlightColor: "transparent",
+  transition: "color 0.25s ease",
   "&:hover": {
     color: BRAND_GOLD,
-    transform: "translateX(4px)",
+    backgroundColor: "transparent",
+    "&::after": { transform: "scaleX(1)" },
+  },
+  "&:focus": {
+    outline: "none",
+    backgroundColor: "transparent",
+    boxShadow: "none",
+  },
+  "&:focus-visible": {
+    outline: "none",
+    color: BRAND_GOLD,
+    backgroundColor: "transparent",
+    "&::after": { transform: "scaleX(1)" },
+  },
+  "&:active": {
+    backgroundColor: "transparent",
+    boxShadow: "none",
+  },
+  "&.Mui-focusVisible": {
+    outline: "none",
+    backgroundColor: "transparent",
+    "&::after": { transform: "scaleX(1)" },
+  },
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    left: 0,
+    bottom: 2,
+    width: "100%",
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: BRAND_GOLD,
+    transform: "scaleX(0)",
+    transformOrigin: "left",
+    transition: "transform 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
   },
 };
 
@@ -108,9 +151,13 @@ export default function FooterCard() {
         background: `linear-gradient(160deg, ${BRAND_BLUE_DARK} 0%, ${BRAND_BLUE} 45%, ${BRAND_BLUE_DARK} 100%)`,
         borderTop: `3px solid ${BRAND_GOLD}`,
         color: "#fff",
-        pt: { xs: 3, md: 3.5 },
-        pb: { xs: "calc(env(safe-area-inset-bottom, 0px) + 72px)", md: 2 },
-        mt: "auto",
+        pt: { xs: 1, sm: 1.25, md: 1.5, lg: 2 },
+        pb: {
+          xs: "calc(env(safe-area-inset-bottom, 0px) + 96px)",
+          sm: "calc(env(safe-area-inset-bottom, 0px) + 96px)",
+          md: 1.5,
+          lg: 2,
+        },
         boxSizing: "border-box",
         "&::before": {
           content: '""',
@@ -126,10 +173,10 @@ export default function FooterCard() {
         sx={{
           position: "relative",
           width: "100%",
-          px: { xs: 1.5, sm: 2, md: 2.5, lg: 3 },
+          px: { xs: 1.5, sm: 2.5, md: 4, lg: 5, xl: 6 },
         }}
       >
-        <Grid container spacing={{ xs: 3, md: 4 }} alignItems="flex-start">
+        <Grid container spacing={{ xs: 2, sm: 2.5, md: 3, lg: 3.5 }} alignItems="flex-start">
           <Grid size={{ xs: 12, sm: 4 }}>
             <Box
               onClick={() => navigate("/")}
@@ -216,12 +263,10 @@ export default function FooterCard() {
                 { id: "hero-section", label: "Home" },
                 { id: "services-section", label: "Services" },
                 { id: "projects-section", label: "Projects" },
+                { id: "reviews-section", label: "Reviews" },
                 { id: "contact-section", label: "Contact" },
               ].map(({ id, label }) => (
                 <Link key={id} component="button" onClick={() => handleNavigation(id)} sx={linkSx}>
-                  <Box component="span" sx={{ color: BRAND_GOLD, fontSize: "0.65rem" }}>
-                    ›
-                  </Box>
                   {label}
                 </Link>
               ))}
@@ -238,8 +283,15 @@ export default function FooterCard() {
           >
             <Typography sx={sectionTitleSx}>Contact</Typography>
             <Stack spacing={0} sx={{ width: "fit-content" }}>
-              <ContactLine icon={LocationOn}>Nairobi, Kenya</ContactLine>
-              <ContactLine icon={Phone}>+254 700 000 000</ContactLine>
+              <ContactLine icon={LocationOn}>{SAFEWIRE_LOCATION}</ContactLine>
+              <ContactLine icon={Phone}>
+                <Link
+                  href={`tel:${SAFEWIRE_PHONE_TEL}`}
+                  sx={{ color: "inherit", textDecoration: "none", "&:hover": { color: BRAND_GOLD } }}
+                >
+                  {SAFEWIRE_PHONE_DISPLAY}
+                </Link>
+              </ContactLine>
               <ContactLine icon={Email}>info@safewireelectrical.com</ContactLine>
             </Stack>
           </Grid>
@@ -247,9 +299,9 @@ export default function FooterCard() {
 
         <Box
           sx={{
-            mt: { xs: 2, md: 2.5 },
-            pt: 1.5,
-            pb: 0,
+            mt: { xs: 1.5, sm: 1.75, md: 2 },
+            pt: { xs: 1.25, sm: 1.5 },
+            pb: { xs: 0.5, sm: 0.5, md: 0 },
             borderTop: "1px solid rgba(255,255,255,0.12)",
             position: "relative",
             "&::before": {

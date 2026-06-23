@@ -1,36 +1,50 @@
 import { createTheme } from "@mui/material/styles";
 
+const BRAND_GOLD = "#f5c518";
+
+const focusVisibleSx = {
+  "&:focus": {
+    outline: "none",
+  },
+  "&:focus-visible": {
+    outline: "none",
+  },
+  "&.Mui-focusVisible": {
+    outline: `2px solid ${BRAND_GOLD}`,
+    outlineOffset: 2,
+  },
+};
+
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#0e8d45", // Vihiga green as primary color
-      light: "#40a86c", // Lighter variant
-      dark: "#0a6231", // Darker variant
+      main: "#1a5fb4",
+      light: "#4a8fd4",
+      dark: "#134a8c",
     },
     secondary: {
-      main: "#f1ea32", // Vihiga yellow as secondary color
-      light: "#f4ef5b", // Lighter variant
-      dark: "#c1bb28", // Darker variant
+      main: "#f5c518",
+      light: "#ffe066",
+      dark: "#c9a012",
     },
     info: {
-      main: "#2491cf", // Vihiga blue
-      light: "#4fa7d9", // Lighter variant
-      dark: "#1b73a5", // Darker variant
+      main: "#2491cf",
+      light: "#4fa7d9",
+      dark: "#1b73a5",
     },
     background: {
       default: "#ffffff",
       paper: "#f9f9f9",
-      dark: "#090909", // Vihiga dark color
+      dark: "#090909",
     },
     text: {
-      primary: "#090909", // Using Vihiga dark for text
+      primary: "#1a1a2e",
       secondary: "#555555",
     },
-    // Keep success color for notifications/status indicators
     success: {
-      main: "#0e8d45", // Using Vihiga green for success states
-      light: "#40a86c",
-      dark: "#0a6231",
+      main: "#2e7d32",
+      light: "#4caf50",
+      dark: "#1b5e20",
     },
   },
   typography: {
@@ -40,6 +54,33 @@ const theme = createTheme({
     },
     button: {
       textTransform: "none",
+    },
+  },
+  components: {
+    MuiButtonBase: {
+      styleOverrides: {
+        root: focusVisibleSx,
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: focusVisibleSx,
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: focusVisibleSx,
+      },
+    },
+    MuiFab: {
+      styleOverrides: {
+        root: focusVisibleSx,
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: focusVisibleSx,
+      },
     },
   },
 });

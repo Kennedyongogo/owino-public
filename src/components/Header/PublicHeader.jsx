@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { AppBar, Toolbar, Box, Typography, Link } from "@mui/material";
-import { Construction, ContactSupport, Home, DesignServices } from "@mui/icons-material";
+import { Construction, ContactSupport, Home, DesignServices, RateReview } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const BRAND_BLUE = "#1a5fb4";
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { id: "hero-section", label: "Home" },
   { id: "services-section", label: "Our Services" },
   { id: "projects-section", label: "Projects" },
+  { id: "reviews-section", label: "Reviews" },
   { id: "contact-section", label: "Contact" },
 ];
 
@@ -42,12 +43,7 @@ const navItemSx = (active, scrolled) => ({
     color: scrolled ? BRAND_BLUE_DARK : "#ffffff",
   },
   "&:focus": { outline: "none" },
-  "&:focus-visible": {
-    outline: "2px solid",
-    outlineColor: scrolled ? BRAND_GOLD : BRAND_GOLD,
-    outlineOffset: 4,
-    borderRadius: "4px",
-  },
+  "&:focus-visible": { outline: "none" },
   "&::after": {
     content: '""',
     position: "absolute",
@@ -80,6 +76,7 @@ const mobileNavBtnSx = (active) => ({
   minWidth: "60px",
   outline: "none",
   "&:focus": { outline: "none" },
+  "&:focus-visible": { outline: "none" },
   "& .MuiSvgIcon-root": {
     fontSize: "1.5rem",
     color: active ? BRAND_GOLD : "rgba(255, 255, 255, 0.72)",
@@ -97,28 +94,35 @@ export default function PublicHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero-section");
 
+  const isHomePage = location.pathname === "/";
+  const isSolidHeader = scrolled || !isHomePage;
+
   useEffect(() => {
+    if (!isHomePage) {
+      setScrolled(true);
+      return;
+    }
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 0);
 
-      if (location.pathname === "/") {
-        const sections = ["hero-section", "services-section", "projects-section", "contact-section"];
-        for (const sectionId of sections) {
-          const element = document.getElementById(sectionId);
-          if (element) {
-            const rect = element.getBoundingClientRect();
-            if (rect.top <= 200 && rect.bottom >= 200) {
-              setActiveSection(sectionId);
-              break;
-            }
+      const sections = ["hero-section", "services-section", "projects-section", "reviews-section", "contact-section"];
+      for (const sectionId of sections) {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 200 && rect.bottom >= 200) {
+            setActiveSection(sectionId);
+            break;
           }
         }
       }
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [location.pathname]);
+  }, [isHomePage]);
 
   const isSectionActive = (sectionId) => {
     if (location.pathname !== "/") return false;
@@ -149,11 +153,11 @@ export default function PublicHeader() {
         position="fixed"
         sx={{
           display: { xs: "none", md: "flex" },
-          backgroundColor: scrolled ? "rgba(255, 255, 255, 0.96)" : "transparent",
-          backdropFilter: scrolled ? "blur(12px)" : "none",
-          boxShadow: scrolled ? "0 4px 24px rgba(26, 95, 180, 0.12)" : "none",
-          borderBottom: scrolled ? `3px solid ${BRAND_GOLD}` : "none",
-          color: scrolled ? BRAND_BLUE : "white",
+          backgroundColor: isSolidHeader ? "rgba(255, 255, 255, 0.96)" : "transparent",
+          backdropFilter: isSolidHeader ? "blur(12px)" : "none",
+          boxShadow: isSolidHeader ? "0 4px 24px rgba(26, 95, 180, 0.12)" : "none",
+          borderBottom: isSolidHeader ? `3px solid ${BRAND_GOLD}` : "none",
+          color: isSolidHeader ? BRAND_BLUE : "white",
           transition: "all 0.3s ease-in-out",
         }}
       >
@@ -170,7 +174,7 @@ export default function PublicHeader() {
               <Box
                 sx={{
                   flexGrow: 1,
-                  color: scrolled ? BRAND_BLUE : "white",
+                  color: isSolidHeader ? BRAND_BLUE : "white",
                   fontWeight: "bold",
                   cursor: "pointer",
                 }}
@@ -187,10 +191,10 @@ export default function PublicHeader() {
                       variant="body2"
                       sx={{
                         fontSize: { xs: "1.5rem", sm: "2.25rem" },
-                        color: scrolled ? BRAND_BLUE : "#ffffff",
+                        color: isSolidHeader ? BRAND_BLUE : "#ffffff",
                         fontWeight: 900,
                         fontFamily: "'Monotype Corsiva', 'Brush Script MT', cursive",
-                        textShadow: scrolled ? "none" : "0 2px 8px rgba(0,0,0,0.25)",
+                        textShadow: isSolidHeader ? "none" : "0 2px 8px rgba(0,0,0,0.25)",
                       }}
                     >
                       SafeWire Electricals
@@ -215,7 +219,7 @@ export default function PublicHeader() {
                   component="button"
                   onClick={() => handleNavigation(id)}
                   aria-current={isSectionActive(id) ? "page" : undefined}
-                  sx={navItemSx(isSectionActive(id), scrolled)}
+                  sx={navItemSx(isSectionActive(id), isSolidHeader)}
                 >
                   {label}
                 </Box>
@@ -254,12 +258,15 @@ export default function PublicHeader() {
           <Construction />
           <Typography variant="caption">Projects</Typography>
         </Link>
+        <Link component="button" onClick={() => handleNavigation("reviews-section")} sx={mobileNavBtnSx(isSectionActive("reviews-section"))}>
+          <RateReview />
+          <Typography variant="caption">Reviews</Typography>
+        </Link>
         <Link component="button" onClick={() => handleNavigation("contact-section")} sx={mobileNavBtnSx(isSectionActive("contact-section"))}>
           <ContactSupport />
           <Typography variant="caption">Contact</Typography>
         </Link>
       </Box>
-      <Box sx={{ display: { xs: "block", md: "none" }, height: "70px" }} />
     </>
   );
 }

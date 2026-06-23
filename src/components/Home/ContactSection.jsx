@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Grid,
-  Paper,
   TextField,
   Button,
   FormControl,
@@ -12,36 +11,144 @@ import {
   MenuItem,
   Autocomplete,
   CircularProgress,
+  Stack,
+  InputAdornment,
+  Card,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import { Email, Phone, LocationOn, Send, Business } from "@mui/icons-material";
+import { Phone, LocationOn, Send, Business } from "@mui/icons-material";
 import Swal from "sweetalert2";
+import {
+  SAFEWIRE_PHONE_DISPLAY,
+  SAFEWIRE_PHONE_TEL,
+  SAFEWIRE_LOCATION,
+} from "../../constants/contact";
+
+const BRAND_BLUE = "#1a5fb4";
+const BRAND_BLUE_DARK = "#134a8c";
+const BRAND_GOLD = "#f5c518";
 
 const MotionBox = motion(Box);
+
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "#ffffff",
+    borderRadius: 2,
+    transition: "box-shadow 0.2s ease, border-color 0.2s ease",
+    "& fieldset": {
+      borderColor: "rgba(26, 95, 180, 0.22)",
+    },
+    "&:hover fieldset": {
+      borderColor: BRAND_BLUE,
+    },
+    "&.Mui-focused": {
+      boxShadow: `0 0 0 3px rgba(245, 197, 24, 0.28)`,
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: BRAND_BLUE,
+      borderWidth: 2,
+    },
+  },
+  "& .MuiInputLabel-root": {
+    color: "rgba(26, 95, 180, 0.65)",
+    "&.Mui-focused": {
+      color: BRAND_BLUE,
+    },
+  },
+  "& .MuiInputBase-input": {
+    color: "#1a1a2e",
+    fontSize: { xs: "0.9rem", sm: "1rem" },
+  },
+};
+
+const swalFix = {
+  customClass: { container: "swal-z-index-fix" },
+  didOpen: () => {
+    const el = document.querySelector(".swal-z-index-fix");
+    if (el) el.style.zIndex = "9999";
+  },
+};
+
+const ContactInfoItem = ({ icon: Icon, label, value, tel }) => (
+  <Stack direction="row" spacing={{ xs: 1.25, sm: 1.5 }} alignItems="center">
+    <Box
+      sx={{
+        width: { xs: 40, sm: 44 },
+        height: { xs: 40, sm: 44 },
+        borderRadius: 2,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+        bgcolor: "rgba(26, 95, 180, 0.08)",
+        border: `1px solid rgba(26, 95, 180, 0.18)`,
+      }}
+    >
+      <Icon sx={{ color: BRAND_BLUE, fontSize: { xs: 20, sm: 22 } }} />
+    </Box>
+    <Box sx={{ minWidth: 0 }}>
+      <Typography
+        sx={{
+          fontSize: { xs: "0.68rem", sm: "0.72rem" },
+          color: BRAND_BLUE,
+          fontWeight: 700,
+          letterSpacing: "0.04em",
+        }}
+      >
+        {label}
+      </Typography>
+      {tel ? (
+        <Typography
+          component="a"
+          href={`tel:${tel}`}
+          sx={{
+            color: BRAND_BLUE_DARK,
+            fontWeight: 600,
+            fontSize: { xs: "0.88rem", sm: "0.95rem" },
+            wordBreak: "break-word",
+            textDecoration: "none",
+            "&:hover": { color: BRAND_BLUE, textDecoration: "underline" },
+          }}
+        >
+          {value}
+        </Typography>
+      ) : (
+        <Typography
+          sx={{
+            color: BRAND_BLUE_DARK,
+            fontWeight: 600,
+            fontSize: { xs: "0.88rem", sm: "0.95rem" },
+            wordBreak: "break-word",
+          }}
+        >
+          {value}
+        </Typography>
+      )}
+    </Box>
+  </Stack>
+);
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    phone_number: "",
     description: "",
     category: "",
     project_id: "",
   });
 
   const [projects, setProjects] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [projectLoading, setProjectLoading] = useState(false);
 
-  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch("/api/issues/categories");
         const data = await response.json();
-        if (data.success) {
-          setCategories(data.data);
-        }
+        if (data.success) setCategories(data.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -52,13 +159,11 @@ export default function ContactSection() {
         const response = await fetch("/api/public-projects");
         const data = await response.json();
         if (data.success) {
-          console.log("Projects fetched:", data.data.length);
           setProjects(data.data);
-        } else {
-          console.error("Failed to fetch projects:", data.message);
+          setAllProjects(data.data);
         }
       } catch (error) {
-        console.error("Error fetching initial projects:", error);
+        console.error("Error fetching projects:", error);
       }
     };
 
@@ -66,50 +171,27 @@ export default function ContactSection() {
     fetchInitialProjects();
   }, []);
 
-  // Filter projects locally based on search term
-  const filterProjects = (searchTerm = "") => {
-    if (!searchTerm || !searchTerm.trim()) {
-      // If no search term, fetch all projects
-      fetchInitialProjects();
-      return;
-    }
-
-    setProjectLoading(true);
-    try {
-      // Filter projects locally from the already loaded projects
-      const filtered = projects.filter(
-        (project) =>
-          project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (project.description &&
-            project.description
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())) ||
-          (project.location &&
-            project.location.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-
-      console.log(
-        `Filtered ${filtered.length} projects for search: "${searchTerm}"`
-      );
-      setProjects(filtered);
-    } catch (error) {
-      console.error("Error filtering projects:", error);
-    } finally {
-      setProjectLoading(false);
-    }
-  };
-
   const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleProjectSearch = (event, value) => {
-    // Filter projects locally as user types
     if (event && event.type === "input") {
-      filterProjects(value);
+      if (!value || !value.trim()) {
+        setProjects(allProjects);
+        return;
+      }
+      setProjectLoading(true);
+      const filtered = allProjects.filter(
+        (project) =>
+          project.name.toLowerCase().includes(value.toLowerCase()) ||
+          (project.description &&
+            project.description.toLowerCase().includes(value.toLowerCase())) ||
+          (project.location_name &&
+            project.location_name.toLowerCase().includes(value.toLowerCase()))
+      );
+      setProjects(filtered);
+      setProjectLoading(false);
     }
   };
 
@@ -120,9 +202,7 @@ export default function ContactSection() {
     try {
       const response = await fetch("/api/issues", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           project_id: formData.project_id || null,
@@ -132,66 +212,40 @@ export default function ContactSection() {
       const data = await response.json();
 
       if (data.success) {
-        // Reset form data
         setFormData({
           name: "",
-          email: "",
+          phone_number: "",
           description: "",
           category: "",
           project_id: "",
         });
-        setProjects([]);
-
-        // Show success SweetAlert
+        setProjects(allProjects);
         Swal.fire({
           icon: "success",
-          title: "Success!",
-          text: "Your message has been sent successfully!",
-          timer: 2000,
+          title: "Message sent!",
+          text: "We'll get back to you shortly.",
+          timer: 2200,
           showConfirmButton: false,
-          customClass: {
-            container: "swal-z-index-fix",
-          },
-          didOpen: () => {
-            const swalContainer = document.querySelector(".swal-z-index-fix");
-            if (swalContainer) {
-              swalContainer.style.zIndex = "9999";
-            }
-          },
+          confirmButtonColor: BRAND_BLUE,
+          ...swalFix,
         });
       } else {
-        // Show error SweetAlert
         Swal.fire({
           icon: "error",
-          title: "Error!",
-          text: data.message || "Failed to send message. Please try again.",
-          customClass: {
-            container: "swal-z-index-fix",
-          },
-          didOpen: () => {
-            const swalContainer = document.querySelector(".swal-z-index-fix");
-            if (swalContainer) {
-              swalContainer.style.zIndex = "9999";
-            }
-          },
+          title: "Could not send",
+          text: data.message || "Please try again.",
+          confirmButtonColor: BRAND_BLUE,
+          ...swalFix,
         });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      // Show network error SweetAlert
       Swal.fire({
         icon: "error",
-        title: "Network Error!",
-        text: "Please check your connection and try again.",
-        customClass: {
-          container: "swal-z-index-fix",
-        },
-        didOpen: () => {
-          const swalContainer = document.querySelector(".swal-z-index-fix");
-          if (swalContainer) {
-            swalContainer.style.zIndex = "9999";
-          }
-        },
+        title: "Network error",
+        text: "Check your connection and try again.",
+        confirmButtonColor: BRAND_BLUE,
+        ...swalFix,
       });
     } finally {
       setLoading(false);
@@ -201,386 +255,341 @@ export default function ContactSection() {
   return (
     <Box
       id="contact-section"
+      component="section"
       sx={{
-        py: 4,
-        background: "linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 50%, #f0f2f5 100%)",
-        position: "relative",
-        overflow: "hidden",
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "radial-gradient(circle at 20% 50%, rgba(0,0,0,0.02) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(0,0,0,0.02) 0%, transparent 50%)",
-          pointerEvents: "none",
-        },
+        width: "100%",
+        maxWidth: "100vw",
+        pt: { xs: 3.5, sm: 4, md: 5, lg: 6 },
+        pb: { xs: 0.5, sm: 1, md: 1.5 },
+        px: { xs: 1, sm: 1.25, md: 1.5, lg: 2 },
+        background: "linear-gradient(160deg, #f4f8ff 0%, #fffef5 50%, #f0f6ff 100%)",
+        boxSizing: "border-box",
       }}
     >
-      <Box
-        sx={{
-          maxWidth: "1400px",
-          margin: "0 auto",
-          px: { xs: 2, sm: 4, md: 6 },
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <MotionBox
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <Paper
-            elevation={0}
+      <Box sx={{ maxWidth: 1400, margin: "0 auto", width: "100%" }}>
+        <Box sx={{ textAlign: { xs: "center", md: "left" }, mb: { xs: 2, sm: 2.5, md: 3 } }}>
+          <Typography
+            variant="overline"
             sx={{
-              borderRadius: 4,
-              overflow: "hidden",
-              backgroundColor: "white",
-              boxShadow: "0 10px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9)",
-              border: "1px solid rgba(0,0,0,0.08)",
-              position: "relative",
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "4px",
-                background: "linear-gradient(90deg, #1a1a1a 0%, #4a4a4a 50%, #1a1a1a 100%)",
-              },
+              color: BRAND_GOLD,
+              fontWeight: 800,
+              letterSpacing: "0.14em",
+              fontSize: "0.75rem",
             }}
           >
-            <Box sx={{ p: 6 }}>
-              <Box sx={{ textAlign: "center", mb: 4 }}>
-                <MotionBox
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 700,
-                      color: "#000",
-                      mb: 2,
-                      letterSpacing: "-0.5px",
-                      textShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                    }}
-                  >
-                    Contact Us
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      maxWidth: 600,
-                      mx: "auto",
-                      color: "#333",
-                      fontSize: "1rem",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    Get in touch with us for your construction needs
-                  </Typography>
-                </MotionBox>
-              </Box>
+            GET IN TOUCH
+          </Typography>
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: 800,
+              fontSize: { xs: "1.75rem", sm: "2.1rem", md: "2.5rem" },
+              color: BRAND_BLUE_DARK,
+              mt: 0.5,
+              mb: 1,
+            }}
+          >
+            Contact Us
+          </Typography>
+          <Typography
+            sx={{
+              maxWidth: 480,
+              fontSize: { xs: "0.9rem", md: "1rem" },
+              color: "text.secondary",
+              lineHeight: 1.65,
+              mx: { xs: "auto", md: 0 },
+            }}
+          >
+            Need a quote, emergency help, or have a question? Send us a message and our team will
+            respond as soon as possible.
+          </Typography>
+          <Box
+            sx={{
+              width: 64,
+              height: 4,
+              mt: 2,
+              borderRadius: 2,
+              background: `linear-gradient(90deg, ${BRAND_BLUE}, ${BRAND_GOLD})`,
+              mx: { xs: "auto", md: 0 },
+            }}
+          />
+        </Box>
 
-              <Box
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }} alignItems="stretch">
+          <Grid size={{ xs: 12, sm: 12, md: 5 }}>
+            <MotionBox
+              initial={{ opacity: 0, x: -16 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.45 }}
+              viewport={{ once: true }}
+              sx={{ height: "100%" }}
+            >
+              <Card
+                elevation={0}
+                sx={{
+                  height: "100%",
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+                  border: `1px solid rgba(26, 95, 180, 0.12)`,
+                  borderTop: `4px solid ${BRAND_GOLD}`,
+                  boxShadow: "0 10px 36px rgba(26, 95, 180, 0.1)",
+                }}
+              >
+                <Box
+                  sx={{
+                    height: 4,
+                    background: `linear-gradient(90deg, ${BRAND_BLUE}, ${BRAND_GOLD}, ${BRAND_BLUE})`,
+                  }}
+                />
+                <Box sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 700, color: BRAND_BLUE, mb: 0.5 }}
+                  >
+                    Reach us directly
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "rgba(26, 95, 180, 0.65)", mb: { xs: 2, sm: 2.5 }, lineHeight: 1.6 }}
+                  >
+                    Prefer to call? Our team is ready to help with quotes, emergencies, and
+                    project enquiries.
+                  </Typography>
+
+                  <Stack spacing={{ xs: 2, sm: 2.5 }}>
+                    <ContactInfoItem icon={Phone} label="CALL US" value={SAFEWIRE_PHONE_DISPLAY} tel={SAFEWIRE_PHONE_TEL} />
+                    <ContactInfoItem icon={LocationOn} label="LOCATION" value={SAFEWIRE_LOCATION} />
+                  </Stack>
+
+                  <Box
+                    sx={{
+                      mt: { xs: 2, sm: 2.5 },
+                      display: "inline-flex",
+                      alignItems: "center",
+                      maxWidth: "100%",
+                      px: { xs: 1.5, sm: 2 },
+                      py: { xs: 0.6, sm: 0.75 },
+                      borderRadius: "20px",
+                      backgroundColor: BRAND_BLUE,
+                      border: `1.5px solid ${BRAND_GOLD}`,
+                      boxShadow: `0 4px 12px rgba(26, 95, 180, 0.25)`,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: { xs: "0.72rem", sm: "0.8rem" },
+                        fontWeight: 600,
+                        color: BRAND_GOLD,
+                        letterSpacing: "0.02em",
+                      }}
+                    >
+                      Certified power, wiring & solar experts
+                    </Typography>
+                  </Box>
+                </Box>
+              </Card>
+            </MotionBox>
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 12, md: 7 }}>
+            <MotionBox
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.08 }}
+              viewport={{ once: true }}
+            >
+              <Card
+                elevation={0}
                 component="form"
                 onSubmit={handleSubmit}
-                sx={{ mt: 2, width: "100%" }}
+                sx={{
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  background: "rgba(255, 255, 255, 0.98)",
+                  border: `1px solid rgba(26, 95, 180, 0.12)`,
+                  borderTop: `4px solid ${BRAND_GOLD}`,
+                  boxShadow:
+                    "0 16px 48px rgba(26, 95, 180, 0.12), 0 0 0 1px rgba(255,255,255,0.5)",
+                }}
               >
-                <TextField
-                  fullWidth
-                  label="Name"
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
+                <Box
                   sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: "#fafafa",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        backgroundColor: "#f5f5f5",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#666",
-                        },
-                      },
-                      "&.Mui-focused": {
-                        backgroundColor: "#fff",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#333",
-                          borderWidth: "2px",
-                        },
-                      },
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "#666",
-                      "&.Mui-focused": {
-                        color: "#000",
-                        fontWeight: 500,
-                      },
-                    },
+                    height: 4,
+                    background: `linear-gradient(90deg, ${BRAND_BLUE}, ${BRAND_GOLD}, ${BRAND_BLUE})`,
                   }}
                 />
 
-                <TextField
-                  fullWidth
-                  label="Email"
-                  type="email"
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: "#fafafa",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        backgroundColor: "#f5f5f5",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#666",
-                        },
-                      },
-                      "&.Mui-focused": {
-                        backgroundColor: "#fff",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#333",
-                          borderWidth: "2px",
-                        },
-                      },
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "#666",
-                      "&.Mui-focused": {
-                        color: "#000",
-                        fontWeight: 500,
-                      },
-                    },
-                  }}
-                />
-
-                <FormControl
-                  fullWidth
-                  margin="normal"
-                  required
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: "#fafafa",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        backgroundColor: "#f5f5f5",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#666",
-                        },
-                      },
-                      "&.Mui-focused": {
-                        backgroundColor: "#fff",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#333",
-                          borderWidth: "2px",
-                        },
-                      },
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "#666",
-                      "&.Mui-focused": {
-                        color: "#000",
-                        fontWeight: 500,
-                      },
-                    },
-                  }}
-                >
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    value={formData.category}
-                    label="Category"
-                    onChange={(e) =>
-                      handleInputChange("category", e.target.value)
-                    }
-                  >
-                    {categories.map((category) => (
-                      <MenuItem key={category.value} value={category.value}>
-                        {category.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <Autocomplete
-                  fullWidth
-                  options={projects}
-                  getOptionLabel={(option) => option.name}
-                  value={
-                    projects.find((p) => p.id === formData.project_id) || null
-                  }
-                  onChange={(event, newValue) => {
-                    handleInputChange("project_id", newValue?.id || "");
-                  }}
-                  onInputChange={handleProjectSearch}
-                  loading={projectLoading}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Project (Optional)"
-                      margin="normal"
+                <Box sx={{ p: { xs: 1.75, sm: 2.5, md: 3, lg: 3.5 } }}>
+                  <Box sx={{ mb: { xs: 1.5, sm: 2 } }}>
+                    <Typography
+                      variant="h6"
                       sx={{
-                        "& .MuiOutlinedInput-root": {
-                          backgroundColor: "#fafafa",
-                          transition: "all 0.3s ease",
-                          "&:hover": {
-                            backgroundColor: "#f5f5f5",
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              borderColor: "#666",
-                            },
-                          },
-                          "&.Mui-focused": {
-                            backgroundColor: "#fff",
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              borderColor: "#333",
-                              borderWidth: "2px",
-                            },
-                          },
-                        },
-                        "& .MuiInputLabel-root": {
-                          color: "#666",
-                          "&.Mui-focused": {
-                            color: "#000",
-                            fontWeight: 500,
-                          },
-                        },
+                        fontWeight: 700,
+                        color: BRAND_BLUE,
+                        fontSize: { xs: "1.1rem", sm: "1.25rem" },
                       }}
+                    >
+                      Send a message
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "rgba(26, 95, 180, 0.65)", mt: 0.25 }}
+                    >
+                      Fill in the form and we&apos;ll get back to you shortly
+                    </Typography>
+                  </Box>
+
+                  <Stack spacing={{ xs: 1.25, sm: 1.5, md: 2 }}>
+                    <TextField
+                      fullWidth
+                      label="Your name"
+                      required
+                      size="small"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange("name", e.target.value)}
+                      sx={fieldSx}
+                    />
+
+                    <TextField
+                      fullWidth
+                      label="Phone number"
+                      type="tel"
+                      required
+                      size="small"
+                      placeholder="e.g. 0712 345 678"
+                      value={formData.phone_number}
+                      onChange={(e) => handleInputChange("phone_number", e.target.value)}
+                      sx={fieldSx}
                       InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {projectLoading ? (
-                              <CircularProgress color="inherit" size={20} />
-                            ) : null}
-                            {params.InputProps.endAdornment}
-                          </>
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Phone sx={{ color: BRAND_BLUE, fontSize: 20 }} />
+                          </InputAdornment>
                         ),
                       }}
                     />
-                  )}
-                  renderOption={(props, option) => (
-                    <Box component="li" {...props}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          width: "100%",
-                        }}
+
+                    <FormControl fullWidth required size="small" sx={fieldSx}>
+                      <InputLabel>What do you need help with?</InputLabel>
+                      <Select
+                        value={formData.category}
+                        label="What do you need help with?"
+                        onChange={(e) => handleInputChange("category", e.target.value)}
                       >
-                        <Business sx={{ mr: 1, color: "#666" }} />
-                        <Box>
-                          <Typography variant="body1" sx={{ color: "#000" }}>
-                            {option.name}
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: "#666" }}>
-                            {option.location} • {option.status}
-                          </Typography>
+                        {categories.map((category) => (
+                          <MenuItem key={category.value} value={category.value}>
+                            {category.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <Autocomplete
+                      fullWidth
+                      size="small"
+                      options={projects}
+                      getOptionLabel={(option) => option.name}
+                      value={projects.find((p) => p.id === formData.project_id) || null}
+                      onChange={(event, newValue) => {
+                        handleInputChange("project_id", newValue?.id || "");
+                      }}
+                      onInputChange={handleProjectSearch}
+                      loading={projectLoading}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Related project (optional)"
+                          sx={fieldSx}
+                          InputProps={{
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {projectLoading ? (
+                                  <CircularProgress color="inherit" size={20} />
+                                ) : null}
+                                {params.InputProps.endAdornment}
+                              </>
+                            ),
+                          }}
+                        />
+                      )}
+                      renderOption={(props, option) => (
+                        <Box component="li" {...props}>
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            <Business sx={{ color: BRAND_BLUE, fontSize: 20 }} />
+                            <Box>
+                              <Typography variant="body2" fontWeight={600}>
+                                {option.name}
+                              </Typography>
+                              {option.location_name && (
+                                <Typography variant="caption" color="text.secondary">
+                                  {option.location_name}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Stack>
                         </Box>
-                      </Box>
-                    </Box>
-                  )}
-                  noOptionsText="No projects found"
-                  clearOnBlur={false}
-                  blurOnSelect
-                />
+                      )}
+                      noOptionsText="No projects found"
+                    />
 
-                <TextField
-                  fullWidth
-                  label="Message"
-                  multiline
-                  rows={4}
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  value={formData.description}
-                  onChange={(e) =>
-                    handleInputChange("description", e.target.value)
-                  }
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: "#fafafa",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        backgroundColor: "#f5f5f5",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#666",
-                        },
-                      },
-                      "&.Mui-focused": {
-                        backgroundColor: "#fff",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#333",
-                          borderWidth: "2px",
-                        },
-                      },
-                    },
-                    "& .MuiInputLabel-root": {
-                      color: "#666",
-                      "&.Mui-focused": {
-                        color: "#000",
-                        fontWeight: 500,
-                      },
-                    },
-                  }}
-                />
+                    <TextField
+                      fullWidth
+                      label="Your message"
+                      multiline
+                      minRows={4}
+                      required
+                      size="small"
+                      value={formData.description}
+                      onChange={(e) => handleInputChange("description", e.target.value)}
+                      sx={fieldSx}
+                    />
 
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    startIcon={
-                      loading ? (
-                        <CircularProgress size={20} sx={{ color: "#fff" }} />
-                      ) : (
-                        <Send sx={{ color: "#fff" }} />
-                      )
-                    }
-                    disabled={loading}
-                    sx={{
-                      px: 5,
-                      py: 1.5,
-                      fontSize: "1rem",
-                      fontWeight: 600,
-                      textTransform: "none",
-                      background: "linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 50%, #2a2a2a 100%)",
-                      color: "#fff",
-                      borderRadius: 2,
-                      boxShadow: "0 4px 15px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.15)",
-                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                      "&:hover": {
-                        background: "linear-gradient(135deg, #2a2a2a 0%, #5a5a5a 50%, #3a3a3a 100%)",
-                        boxShadow: "0 6px 20px rgba(0,0,0,0.35), 0 3px 8px rgba(0,0,0,0.2)",
-                        transform: "translateY(-2px)",
-                      },
-                      "&:active": {
-                        transform: "translateY(0)",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-                      },
-                      "&:disabled": {
-                        background: "linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 50%, #2a2a2a 100%)",
-                        opacity: 0.6,
-                      },
-                    }}
-                  >
-                    {loading ? "Sending..." : "Send Message"}
-                  </Button>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      fullWidth
+                      size="large"
+                      disabled={loading}
+                      startIcon={
+                        loading ? (
+                          <CircularProgress size={18} color="inherit" />
+                        ) : (
+                          <Send />
+                        )
+                      }
+                      sx={{
+                        py: { xs: 1.1, sm: 1.25 },
+                        borderRadius: 2,
+                        textTransform: "none",
+                        fontSize: { xs: "0.95rem", sm: "1.05rem" },
+                        fontWeight: 700,
+                        letterSpacing: "0.03em",
+                        color: "#fff",
+                        background: `linear-gradient(135deg, ${BRAND_BLUE} 0%, ${BRAND_BLUE_DARK} 100%)`,
+                        boxShadow: `0 6px 20px rgba(26, 95, 180, 0.4)`,
+                        border: `1px solid rgba(245, 197, 24, 0.35)`,
+                        transition: "all 0.25s ease",
+                        "&:hover": {
+                          background: `linear-gradient(135deg, ${BRAND_BLUE_DARK} 0%, ${BRAND_BLUE} 100%)`,
+                          boxShadow: `0 8px 28px rgba(26, 95, 180, 0.5), 0 0 0 2px rgba(245, 197, 24, 0.25)`,
+                          transform: "translateY(-1px)",
+                        },
+                        "&:disabled": {
+                          background: "rgba(26, 95, 180, 0.4)",
+                          color: "rgba(255,255,255,0.8)",
+                        },
+                      }}
+                    >
+                      {loading ? "Sending…" : "Send Message"}
+                    </Button>
+                  </Stack>
                 </Box>
-              </Box>
-            </Box>
-          </Paper>
-        </MotionBox>
+              </Card>
+            </MotionBox>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

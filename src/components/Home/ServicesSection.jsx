@@ -174,13 +174,15 @@ export default function ServicesSection() {
     <Box
       id="services-section"
       sx={{
-        py: { xs: 5, md: 7 },
-        px: { xs: 1.5, sm: 4, md: 6 },
+        pt: { xs: 1, sm: 1.25, md: 1.5, lg: 2 },
+        pb: { xs: 0.5, sm: 1, md: 1.5 },
+        px: { xs: 1, sm: 1.25, md: 1.5, lg: 2 },
         background: "linear-gradient(160deg, #f4f8ff 0%, #fffef5 50%, #f0f6ff 100%)",
+        boxSizing: "border-box",
       }}
     >
-      <Box sx={{ maxWidth: 1400, margin: "0 auto" }}>
-        <Box sx={{ textAlign: "center", mb: { xs: 3, md: 5 } }}>
+      <Box sx={{ maxWidth: 1400, margin: "0 auto", width: "100%" }}>
+        <Box sx={{ textAlign: "center", mb: { xs: 2, sm: 2.5, md: 3 } }}>
           <Typography
             variant="overline"
             sx={{

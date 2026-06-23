@@ -16,6 +16,7 @@ import "./App.css";
 import React, { useState, useEffect, Suspense, lazy } from "react";
 import PublicHeader from "./components/Header/PublicHeader";
 import Footer from "./components/Footer/Footer";
+import WhatsAppFloat from "./components/Common/WhatsAppFloat";
 
 // Lazy load components
 const Home = lazy(() => import("./pages/Home"));
@@ -78,6 +79,7 @@ function App() {
       <CssBaseline />
       <Router>
         <ScrollToTop />
+        <WhatsAppFloat />
         <Suspense
           fallback={
             <Box
