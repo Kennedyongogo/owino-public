@@ -298,7 +298,6 @@ export default function ProjectDetails() {
         width: "100%",
         minHeight: "100vh",
         background: "linear-gradient(160deg, #f4f8ff 0%, #fffef5 50%, #f0f6ff 100%)",
-        pb: { xs: "calc(env(safe-area-inset-bottom, 0px) + 72px)", md: 0 },
       }}
     >
       {/* Edge-to-edge hero */}
@@ -800,7 +799,7 @@ export default function ProjectDetails() {
           background: `linear-gradient(135deg, ${BRAND_BLUE_DARK} 0%, ${BRAND_BLUE} 100%)`,
           borderTop: `3px solid ${BRAND_GOLD}`,
           pt: { xs: 2, sm: 2.25, md: 2.5 },
-          pb: { xs: 0.5, sm: 1, md: 1.5 },
+          pb: { xs: 1.5, sm: 1, md: 1.5 },
           px: { xs: 1, sm: 1.25, md: 1.5, lg: 2 },
         }}
       >
